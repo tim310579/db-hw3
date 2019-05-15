@@ -577,6 +577,11 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
    size_t las = 0;
    size_t k = 0;
    for(k = 0; k < agg_ct-1; k++){
+	avg_id = 0;
+    	avg_age = 0;
+    	count_ans = 0;
+    	sum_id = 0;
+    	sum_age = 0;
    	for(i = las+1; i < cmd->args_len; i++){
         	int cnt = 0;
         	if(!strncmp(cmd->args[i], "avg(id)", 7)){
