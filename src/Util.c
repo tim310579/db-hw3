@@ -548,71 +548,173 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
         }*/
    // } else {
    size_t j = 0;
-   double avg_ans = 0;
+   double avg_id = 0;
+   double avg_age = 0;
    int count_ans = 0;
-   int sum_ans = 0;
-   char aggre = 'n';
+   int sum_id = 0;
+   int sum_age = 0;
+   //char aggre = 'n';
+   int agg = 0;
+   size_t agg_ct = 0;
    for(i = 0; i < cmd->args_len; i++){
-        int cnt = 0;
-        if(!strncmp(cmd->args[i], "avg(id)", 7)){
-		aggre = 'a';
-                for(j = 0; j < table->len; j++){
-                        if(ch_last[j] == 1){
-                                cnt ++;
-                                avg_ans += get_User(table, j)->id;
-                        }
-                }
-                avg_ans /= cnt;
-        }
-        else if(!strncmp(cmd->args[i], "avg(age)", 8)){
-		aggre = 'a';
-                for(j = 0; j < table->len; j++){
-                        if(ch_last[j] == 1){
-                                cnt ++;
-                                avg_ans += get_User(table, j)->age;
-                        }
-                }
-                avg_ans /= cnt;
-        }
+   	if(!strncmp(cmd->args[i], "avg", 3)){
+		agg = 1;
+		agg_ct++;
+	}
 	else if(!strncmp(cmd->args[i], "count", 5)){
-                aggre = 'c';
-                for(j = 0; j < table->len; j++){
-                        if(ch_last[j] == 1){
-                                count_ans ++;
-                                //avg_ans += get_User(table, j)->age;
+		agg = 1;
+		agg_ct++;
+	}
+	else if(!strncmp(cmd->args[i], "sum", 3)){
+		agg = 1;
+		agg_ct++;
+	}
+   }
+   if(agg == 1){
+	   //char aggre = 'n';
+	   printf("(");
+   
+   size_t las = 0;
+   size_t k = 0;
+   for(k = 0; k < agg_ct-1; k++){
+   	for(i = las+1; i < cmd->args_len; i++){
+        	int cnt = 0;
+        	if(!strncmp(cmd->args[i], "avg(id)", 7)){
+			//printf("%s, %s", cmd->args[i], cmd->args[i+1]);
+                	for(j = 0; j < table->len; j++){
+                        	if(ch_last[j] == 1){
+                                	cnt ++;
+                                	avg_id += get_User(table, j)->id;
+                        	}
+                	}
+                	avg_id /= cnt;
+			printf("%.3f, ", avg_id);
+			las = i;
+			i = cmd->args_len;
+        	}
+		else if(!strncmp(cmd->args[i], "avg(age)", 8)){
+            		for(j = 0; j < table->len; j++){
+                        	if(ch_last[j] == 1){
+                                	cnt ++;
+                               		avg_age += get_User(table, j)->age;
+                        	}
+                	}
+                	avg_age /= cnt;
+			printf("%.3f, ", avg_age);
+			las = i;
+                         i = cmd->args_len;
+        	}
+		else if(!strncmp(cmd->args[i], "count", 5)){
+                
+                	for(j = 0; j < table->len; j++){
+                        	if(ch_last[j] == 1){
+                                	count_ans ++;
+                                	//avg_ans += get_User(table, j)->age;
+                        	}
+                	}
+			printf("%d, ", count_ans);
+			las = i;
+			i = cmd->args_len;
+        	}
+		else if(!strncmp(cmd->args[i], "sum(id)", 7)){
+                //	aggre = 's';
+                	for(j = 0; j < table->len; j++){
+                        	if(ch_last[j] == 1){
+                                	//countt ++;
+                                	sum_id  += get_User(table, j)->id;
+                        	}
+                	}
+			las = i;
+			printf("%d, ", sum_id);
+                        i = cmd->args_len;
+        	}
+		else if(!strncmp(cmd->args[i], "sum(age)", 8)){
+               
+                	for(j = 0; j < table->len; j++){
+                        	if(ch_last[j] == 1){
+                                	//countt ++;
+                                	sum_age += get_User(table, j)->age;
+                        	}
+                	}
+			las = i;
+			printf("%d, ", sum_age);
+                        i = cmd->args_len;
+        	}
+	}
+   }
+    avg_id = 0;
+    avg_age = 0;
+    count_ans = 0;
+    sum_id = 0;
+    sum_age = 0;
+   for(i = las+1; i < cmd->args_len; i++){
+   	int cnt = 0;
+                if(!strncmp(cmd->args[i], "avg(id)", 7)){
+               //         aggre = 'a';
+                        //printf("%s, %s", cmd->args[i], cmd->args[i+1]);
+                        for(j = 0; j < table->len; j++){
+                                if(ch_last[j] == 1){
+                                        cnt ++;
+                                        avg_id += get_User(table, j)->id;
+                                }
                         }
+                        avg_id /= cnt;
+                        printf("%.3f)\n", avg_id);
+                        //las = i;
+                      
                 }
-        }
-	else if(!strncmp(cmd->args[i], "sum(id)", 7)){
-                aggre = 's';
-                for(j = 0; j < table->len; j++){
-                        if(ch_last[j] == 1){
-                                //countt ++;
-                                sum_ans  += get_User(table, j)->id;
+            
+                else if(!strncmp(cmd->args[i], "avg(age)", 8)){
+                 //       aggre = 'a';
+                        for(j = 0; j < table->len; j++){
+                                if(ch_last[j] == 1){
+                                        cnt ++;
+                                        avg_age += get_User(table, j)->age;
+                                }
                         }
+                        avg_age /= cnt;
+                        printf("%.3f)\n", avg_age);
+                        //las = i;
+                       // break;
                 }
-        }
-	else if(!strncmp(cmd->args[i], "sum(age)", 8)){
-                aggre = 's';
-                for(j = 0; j < table->len; j++){
-                        if(ch_last[j] == 1){
-                                //countt ++;
-                                sum_ans += get_User(table, j)->age;
+                else if(!strncmp(cmd->args[i], "count", 5)){
+		//	aggre = 'c';
+                        for(j = 0; j < table->len; j++){
+                                if(ch_last[j] == 1){
+                                        count_ans ++;
+                                        //avg_ans += get_User(table, j)->age;
+                                }
                         }
+                        printf("%d)\n", count_ans);
+                        //las = i;
+                        //break;
                 }
-        }
-
-
+                else if(!strncmp(cmd->args[i], "sum(id)", 7)){
+                  //      aggre = 's';
+                        for(j = 0; j < table->len; j++){
+                                if(ch_last[j] == 1){
+                                        //countt ++;
+                                        sum_id  += get_User(table, j)->id;
+                                }
+                        }
+                        //las = i;
+                        printf("%d)\n", sum_id);
+                        //break;
+                }
+                else if(!strncmp(cmd->args[i], "sum(age)", 8)){
+                    //    aggre = 's';
+                        for(j = 0; j < table->len; j++){
+                                if(ch_last[j] == 1){
+                                        //countt ++;
+                                        sum_age += get_User(table, j)->age;
+                                }
+                        }
+                        //las = i;
+                        printf("%d)\n", sum_age);
+		}
+   	
    }
-   if(aggre == 'a'){
-   	printf("(%.3f)\n", avg_ans);
-   }
-   else if(aggre == 'c'){
-   	printf("(%d)\n", count_ans);
-   }
-   else if(aggre == 's'){
-   	printf("(%d)\n", sum_ans);
-   }
+  }
    else{
         int ct = 0;
         for (idx = offset; idx < table->len; idx++) {
