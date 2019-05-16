@@ -576,6 +576,22 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
    
    size_t las = 0;
    size_t k = 0;
+   int limitnum;
+   limitnum = table->len;
+   int offsetnum;
+   offsetnum = 0;
+   char tem[100];
+   for(i = 0; i < cmd->args_len; i++){
+	   if(!strncmp(cmd->args[i], "offset", 6)){
+		strcpy(tem, cmd->args[i+1]);
+		offsetnum = atoi(tem);
+	   }
+	   else if(!strncmp(cmd->args[i], "limit", 5)){
+                strcpy(tem, cmd->args[i+1]);
+                limitnum = atoi(tem);
+           }
+   }
+   //printf("%d, %d\n", offsetnum, limitnum);
    for(k = 0; k < agg_ct-1; k++){
 	avg_id = 0;
     	avg_age = 0;
@@ -584,13 +600,20 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
     	sum_age = 0;
    	for(i = las+1; i < cmd->args_len; i++){
         	int cnt = 0;
+		int ct = 0;
         	if(!strncmp(cmd->args[i], "avg(id)", 7)){
 			//printf("%s, %s", cmd->args[i], cmd->args[i+1]);
                 	for(j = 0; j < table->len; j++){
                         	if(ch_last[j] == 1){
-                                	cnt ++;
-                                	avg_id += get_User(table, j)->id;
-                        	}
+                                	ct ++;
+					if(ct > offsetnum){
+                                		avg_id += get_User(table, j)->id;
+						cnt ++;
+					}
+					if(cnt >= limitnum){
+						j = table->len;
+					}
+				}
                 	}
                 	avg_id /= cnt;
 			printf("%.3f, ", avg_id);
@@ -600,8 +623,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
 		else if(!strncmp(cmd->args[i], "avg(age)", 8)){
             		for(j = 0; j < table->len; j++){
                         	if(ch_last[j] == 1){
-                                	cnt ++;
-                               		avg_age += get_User(table, j)->age;
+                                	ct ++;
+                                        if(ct > offsetnum){
+                                                avg_age += get_User(table, j)->age;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                         	}
                 	}
                 	avg_age /= cnt;
@@ -613,8 +642,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
                 
                 	for(j = 0; j < table->len; j++){
                         	if(ch_last[j] == 1){
-                                	count_ans ++;
-                                	//avg_ans += get_User(table, j)->age;
+					ct ++;
+					if(ct > offsetnum){
+                                		count_ans ++;
+                               			cnt ++;
+					}
+					if(cnt >= limitnum){
+						j = table->len;
+					}
                         	}
                 	}
 			printf("%d, ", count_ans);
@@ -625,8 +660,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
                 //	aggre = 's';
                 	for(j = 0; j < table->len; j++){
                         	if(ch_last[j] == 1){
-                                	//countt ++;
-                                	sum_id  += get_User(table, j)->id;
+                                	ct ++;
+                                        if(ct > offsetnum){
+                                                sum_id += get_User(table, j)->id;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                         	}
                 	}
 			las = i;
@@ -637,8 +678,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
                
                 	for(j = 0; j < table->len; j++){
                         	if(ch_last[j] == 1){
-                                	//countt ++;
-                                	sum_age += get_User(table, j)->age;
+                                	ct ++;
+                                        if(ct > offsetnum){
+                                                sum_age += get_User(table, j)->age;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                         	}
                 	}
 			las = i;
@@ -653,14 +700,22 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
     sum_id = 0;
     sum_age = 0;
    for(i = las+1; i < cmd->args_len; i++){
-   	int cnt = 0;
+   	int ct = 0;
+        int cnt = 0;
                 if(!strncmp(cmd->args[i], "avg(id)", 7)){
                //         aggre = 'a';
                         //printf("%s, %s", cmd->args[i], cmd->args[i+1]);
                         for(j = 0; j < table->len; j++){
                                 if(ch_last[j] == 1){
-                                        cnt ++;
-                                        avg_id += get_User(table, j)->id;
+                                	ct ++;
+                                        if(ct > offsetnum){
+						//printf("%d, %d, %d\n", ct, offset, limitnum);
+                                                avg_id += get_User(table, j)->id;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                                 }
                         }
                         avg_id /= cnt;
@@ -673,8 +728,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
                  //       aggre = 'a';
                         for(j = 0; j < table->len; j++){
                                 if(ch_last[j] == 1){
-                                        cnt ++;
-                                        avg_age += get_User(table, j)->age;
+                                        ct ++;
+                                        if(ct > offsetnum){
+                                                avg_age += get_User(table, j)->age;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                                 }
                         }
                         avg_age /= cnt;
@@ -686,8 +747,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
 		//	aggre = 'c';
                         for(j = 0; j < table->len; j++){
                                 if(ch_last[j] == 1){
-                                        count_ans ++;
-                                        //avg_ans += get_User(table, j)->age;
+                                        ct ++;
+                                        if(ct > offsetnum){
+                                                count_ans ++;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                                 }
                         }
                         printf("%d)\n", count_ans);
@@ -698,8 +765,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
                   //      aggre = 's';
                         for(j = 0; j < table->len; j++){
                                 if(ch_last[j] == 1){
-                                        //countt ++;
-                                        sum_id  += get_User(table, j)->id;
+                                        ct ++;
+                                        if(ct > offsetnum){
+                                                sum_id += get_User(table, j)->id;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                                 }
                         }
                         //las = i;
@@ -710,8 +783,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
                     //    aggre = 's';
                         for(j = 0; j < table->len; j++){
                                 if(ch_last[j] == 1){
-                                        //countt ++;
-                                        sum_age += get_User(table, j)->age;
+                                        ct ++;
+                                        if(ct > offsetnum){
+                                                sum_age += get_User(table, j)->age;
+                                                cnt ++;
+                                        }
+                                        if(cnt >= limitnum){
+                                                j = table->len;
+                                        }
                                 }
                         }
                         //las = i;
@@ -722,14 +801,18 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
   }
    else{
         int ct = 0;
-        for (idx = offset; idx < table->len; idx++) {
-            if ((limit != -1 && ct >= limit)){
+	int cnt = 0;
+        for (idx = 0; idx < table->len; idx++) {
+            if ((limit != -1 && cnt >= limit)){
 			   // (idx - offset) >= limit) {
                 break;
             }
 	    if(ch_last[idx] == 1){
-		ct ++;
-		print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
+		    ct ++;
+		    if(ct > offset){
+			print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
+		    	cnt ++;
+		    }
 	    }
 	    else if(ch_last[idx] == 0){
 	    	//no need to print
