@@ -485,7 +485,7 @@ void print_user(User_t *user, SelectArgs_t *sel_args) {
 ///
 void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd) {
     size_t idx;
-    int limit = cmd->cmd_args.sel_args.limit;
+    //int limit = cmd->cmd_args.sel_args.limit;
     int offset = cmd->cmd_args.sel_args.offset;
 
     if (offset == -1) {
@@ -802,14 +802,30 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
    else{
         int ct = 0;
 	int cnt = 0;
+	int limitnum;
+	char tem[100];
+   limitnum = table->len;
+   int offsetnum;
+   offsetnum = 0;
+	for(i = 0; i < cmd->args_len; i++){
+		if(!strncmp(cmd->args[i], "limit", 5)){
+                	strcpy(tem, cmd->args[i+1]);
+               	 	limitnum = atoi(tem);
+           	}
+		if(!strncmp(cmd->args[i], "offset", 6)){
+			strcpy(tem, cmd->args[i+1]);
+			offsetnum = atoi(tem);
+	   	}
+	}
+	//printf("%d  fskdfhskf\n", limit);
         for (idx = 0; idx < table->len; idx++) {
-            if ((limit != -1 && cnt >= limit)){
-			   // (idx - offset) >= limit) {
+            if (  cnt >= limitnum){
+	 	    // (idx - offset) >= limit) {
                 break;
             }
-	    if(ch_last[idx] == 1){
+	    else if(ch_last[idx] == 1){
 		    ct ++;
-		    if(ct > offset){
+		    if(ct > offsetnum){
 			print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
 		    	cnt ++;
 		    }
